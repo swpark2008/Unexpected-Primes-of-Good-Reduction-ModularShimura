@@ -4,7 +4,7 @@ The following repository contains Magma and Sage implementations utilized to com
 
 * Magma Code: We execute the file "Computations-PPV-Shimura". The total execution time and memory usage can be found in the file "ExecutionTime". The code will output all files of form "Shimura-W-ResultsXXX", where W is the number of distinct prime factors of the level N, and XXX indicates the type of sign pattern endowed to the modular curve with W many distinct prime factors.
 * Given the execution time for running the Magma code is very long, we stored all the outputs one achieves from running the code under the folder "Shimura-Data-New".
-* Sage Code: We attach the jupyter notebook file "PPV-Snew.html". To run the code as shown in the file, one is required to follow the following procedures beforehand.
+* Sage Code: We attach the jupyter notebook file "Snew.ipynb". A sample output of running the code can be downloaded using the html file "PPV-Snew.html". To run the "Snew.ipynb" code as shown in the file, one is required to follow the following procedures beforehand.
   - Access the LMFDB beta page: https://beta.lmfdb.org/NumberField/QuadraticImaginaryClassGroups
   - Download the following list of files:
     + |d| = 3 mod 8, k = 0, 1, 2
