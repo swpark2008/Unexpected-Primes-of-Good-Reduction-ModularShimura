@@ -1,0 +1,102 @@
+load "Computations-Shimura-Basic";
+
+// module for creating all possible sign patterns
+sign_list := [[a1,a2,a3,a4,a5,a6,a7,a8,a9,a10] : a1,a2,a3,a4,a5,a6,a7,a8,a9,a10 in {-1,1}];
+
+// module for generating the desired set of prime factors
+b10 := 2402574532579;
+
+B10 := [];
+for i in [1..#sign_list] do
+	B10 := B10 cat [[sign_list[i]]];
+end for;
+print(B10);
+
+bp1 := FloorBound(b10,1,10);
+for p1 in [2,3] do
+    	bp2 := FloorBound(b10,p1,9);
+    	if bp2 lt p1+1 then
+        	break;
+    	end if;
+	for p2 in PrimesInInterval(p1+1,bp2) do
+		bp3 := FloorBound(b10,p1*p2,8);
+		if bp3 lt p2+1 then
+				break;
+		end if;
+		for p3 in PrimesInInterval(p2+1,bp3) do
+			bp4 := FloorBound(b10,p1*p2*p3,7);
+			if bp4 lt p3+1 then
+				break;
+			end if;
+			for p4 in PrimesInInterval(p3+1,bp4) do
+				bp5 := FloorBound(b10,p1*p2*p3*p4,6);
+				if bp5 lt p4+1 then
+					break;
+				end if;
+				for p5 in PrimesInInterval(p4+1,bp5) do
+					bp6 := FloorBound(b10,p1*p2*p3*p4*p5,5);
+					if bp6 lt p5+1 then
+						break;
+					end if;
+					for p6 in PrimesInInterval(p5+1,bp6) do
+						bp7 := FloorBound(b10,p1*p2*p3*p4*p5*p6,4);
+						if bp7 lt p6+1 then
+							break;
+						end if;
+						for p7 in PrimesInInterval(p6+1,bp7) do
+							bp8 := FloorBound(b10,p1*p2*p3*p4*p5*p6*p7,3);
+							if bp8 lt p7+1 then
+								break;
+							end if;
+							for p8 in PrimesInInterval(p7+1,bp8) do
+								bp9 := FloorBound(b10,p1*p2*p3*p4*p5*p6*p7*p8,2);
+								if bp9 lt p8+1 then
+									break;
+								end if;
+								for p9 in PrimesInInterval(p8+1,bp9) do
+									B10_sub := [];
+									bp10 := FloorBound(b10,p1*p2*p3*p4*p5*p6*p7*p8*p9,1);
+									if bp10 lt p9+1 then
+										break;
+									end if;
+									for p10 in PrimesInInterval(p9+1,bp10) do
+										N := p1*p2*p3*p4*p5*p6*p7*p8*p9*p10;
+										if N le b10 then
+											prime_list_test := [p1,p2,p3,p4,p5,p6,p7,p8,p9,p10];
+											print(prime_list_test);
+											for i in [1] do
+												sign_pattern := sign_list[i];
+												if NaiveSieve_pre(prime_list_test, p1, sign_pattern) then
+													B10_sub := B10_sub cat [prime_list_test];
+												end if;
+											end for;
+										end if;
+									end for;
+									
+									print("Legendre Sieve");
+									print(#B10_sub);
+									for prime_list_test in B10_sub do
+										print(prime_list_test);
+										for i in [1..#sign_list] do
+											sign_pattern := sign_list[i];
+											if NaiveSieve_two(prime_list_test, p1, sign_pattern) then
+												B10[i] := B10[i] cat [prime_list_test];
+											end if;
+										end for;
+									end for;
+								end for;
+							end for;
+						end for;
+					end for;
+				end for;
+			end for;
+		end for;
+	end for;
+end for;
+
+for i in [1..#sign_list] do
+	title := "Shimura-10-Results" cat IntegerToString(i);
+	if #B10[i] ge 2 then
+		Write(title,B10[i]: Overwrite := true);
+	end if;
+end for;

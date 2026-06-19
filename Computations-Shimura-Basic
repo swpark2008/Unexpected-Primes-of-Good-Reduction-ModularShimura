@@ -1,0 +1,201 @@
+// function for obtaining bounds for forloops used to iterate prime factors
+
+FloorBound := function(B,prod,k) 
+	return Floor((B/prod)^(1/k));
+end function;
+
+// Candidate pairs for (D,N) given a list of divisors for DN
+Admissible := function(F,n)
+	sets := Permutations(SequenceToSet(F),n); 
+	result := [];
+	for s in sets do
+		sort := Sort(s);
+		if sort in result eq false then
+			result := result cat [sort];
+		end if;
+	end for;
+	return result;
+end function;
+
+Complement := function(F,FF)
+	return [i : i in F | i in FF eq false];
+end function;
+
+
+//n is omega(DN)
+
+
+AdmissibleSum := function(n)
+	return [[2*i,n-2*i] : i in [1..Floor(n/2)]];
+end function;
+
+//n is omega(DN)
+
+//n := ...;
+
+CandidatePairs := function(F)
+	result := [];
+	n := #F;
+	for sum in AdmissibleSum(n) do
+		n1 := sum[1]; n2 := sum[2];
+		if n1 lt n2 then
+			result := result cat [[set,Complement(F,set)] : set in Admissible(F,n1)];
+			else result := result cat [[Complement(F,set),set] : set in Admissible(F,n2)];
+		end if;
+	end for;
+	return result;
+end function;
+
+// [F1,F2] in CandidatePairs(F)
+SignPattern := function(F,F1,F2)
+	result := [];
+	for p in F do
+		if p in F1 then 
+			result := result cat [-1];
+			else result := result cat [1];
+		end if;
+	end for;
+	return result;
+end function;
+
+// module for Step3 sieve result on applying conditions for S. The only place to change is the set B* for the definition of omega and for loop statement for prime_list. Required input is the nested list of list of prime factors (B*) & p1 (the smallest possible prime number).
+
+evaluate_sign := function(number_fact, large_number_fact, pattern)
+	LNF := Sort(SetToSequence(large_number_fact));
+	NF := Sort(SetToSequence(number_fact));
+	new_pattern := [];
+
+	for i in [1..#LNF] do
+		new_pattern := new_pattern cat [[LNF[i], pattern[i]]];
+	end for;
+
+	sign_result := 1;
+
+	for i in [1..#new_pattern] do
+		if new_pattern[i][1] in NF then
+			sign_result := sign_result * new_pattern[i][2];
+		end if;
+	end for;
+	
+	if sign_result eq 1 then
+		return 1;
+	else
+		return -1;
+	end if;
+end function;
+
+// module for Step3 seive result on applying conditions for S. This evaluates the constant b(D, N/D) and tells what the sign is.
+evaluate_b := function(D_input, NoverD_input)
+	if NoverD_input mod 2 eq 0 then
+		return -1;
+	else
+		return 1;
+	end if;
+end function;
+
+//Step 2: module for sieve result on sieving out list of prime factors before applying NaiveSieve_two. We evaluate \sum sqrt{d} 2^(omega(N/d)) log(4d) directly.
+NaiveSieve_pre := function(prime_list_test,p1,sign_pattern)
+	SetNthreads(64);
+	omega := #prime_list_test;
+	pset := {p : p in prime_list_test};
+	N := &*prime_list_test;
+	varphi_N := &*[p-1 : p in prime_list_test]; 
+	if p1 eq 3 then
+		R := 1/12*varphi_N - 9/4*2^omega - 1;
+	elif p1 eq 2 then
+		R := 1/12*varphi_N - 3*2^omega - 1;
+	else
+		R := 1/12*varphi_N - 19/12*2^omega - 1;
+	end if;
+
+	for x in Subsets(pset) do
+		NoverD := &*x;
+		omega_NoverD := #x;
+		D := Floor(N/(NoverD));
+		naive_estimate := 2/3.14*D^(1/2)*Log(4*D)*2^(omega_NoverD);
+		R := R - naive_estimate;
+	end for;
+
+	if R lt 1 then
+		return true;
+	else
+		return false;
+	end if;
+end function;
+
+//Step 3: module for sieve result on sieving out list of prime factors before applying NaiveSieve_two. We evaluate \sum sqrt{d} 2^(omega(N/d)) log(4d) directly. We use the approximation pi >= 3.14, and the exponent for 2 simplifies to omega(N) - omega(d) = omega(N/d). See equation (13) + (14) in particular. 
+NaiveSieve_two := function(prime_list_test,p1,sign_pattern)
+	SetNthreads(64);
+	omega := #prime_list_test;
+	pset := {p : p in prime_list_test};
+	N := &*prime_list_test;
+	varphi_N := &*[p-1 : p in prime_list_test]; 
+	if p1 eq 3 then
+		R := 1/12*varphi_N - 9/4*2^omega - 1;
+	elif p1 eq 2 then
+		R := 1/12*varphi_N - 3*2^omega - 1;
+	else
+		R := 1/12*varphi_N - 19/12*2^omega - 1;
+	end if;
+
+	for x in Subsets(pset) do
+		naive_estimate := 0;
+		NoverD := &*x;
+		omega_NoverD := #x;
+		D := Floor(N/(NoverD));
+		D_factors := {num : num in pset | num notin x};
+		// Sign of epsilon_N(D)
+		sign := evaluate_sign(D_factors, pset, sign_pattern);
+		// Sign of b(D,N/D)
+		b_const := evaluate_b(D, NoverD);
+		// Sign of \prod_{p | N/D_odd} ((Legendre) - 1)
+		sign_x := (-1)^omega_NoverD;
+		// Condition (a) from Step 3
+		if #x ne 0 and p1 ne 2 and D gt 3 and sign*b_const*sign_x eq 1 then
+			s := 0;
+			for q in x do
+				if q ne 2 and LegendreSymbol(-1*D,q) eq 1 then
+					s := 1;
+					break;
+				end if;
+			end for;
+			if s eq 0 then
+				naive_estimate := naive_estimate + 2/3.14*D^(1/2)*Log(4*D)*2^(omega_NoverD);
+			end if;
+		end if;
+		// Condition (b) from Step 3
+		if #x ne 0 and p1 eq 2 and D gt 3 and D mod 2 eq 1 and sign*b_const*sign_x eq -1 then
+			s := 0;
+			for q in x do
+				if q ne 2 and LegendreSymbol(-1*D,q) eq 1 then
+					s := 1;
+					break;
+				end if;
+			end for;
+			if s eq 0 then
+				naive_estimate := naive_estimate + 2/3.14*D^(1/2)*Log(4*D)*2^(omega_NoverD);
+			end if;
+		end if;
+		// Condition (c) from Step 3
+		if #x ne 0 and p1 eq 2 and D gt 3 and D mod 2 ne 1 and sign*b_const*sign_x eq -1 then
+			s := 0;
+			for q in x do
+				if q ne 2 and LegendreSymbol(-1*D,q) eq 1 then
+					s := 1;
+					break;
+				end if;
+			end for;
+			if s eq 0 then
+				naive_estimate := naive_estimate + 2/3.14*D^(1/2)*Log(4*D)*2^(omega_NoverD);
+			end if;
+		end if;
+		R := R - naive_estimate;
+	end for;
+
+	if R lt 1 then
+		return true;
+	else
+		return false;
+	end if;
+
+end function;

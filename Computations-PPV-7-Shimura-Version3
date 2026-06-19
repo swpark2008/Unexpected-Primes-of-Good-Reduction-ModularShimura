@@ -1,0 +1,84 @@
+load "Computations-Shimura-Basic";
+
+// module for creating all possible sign patterns
+sign_list := [[a1,a2,a3,a4,a5,a6,a7] : a1,a2,a3,a4,a5,a6,a7 in {-1,1}];
+
+// module for generating the desired set of prime factors
+b7 := 20662946692;
+
+B7 := [];
+for i in [1..#sign_list] do
+	B7 := B7 cat [[sign_list[i]]];
+end for;
+print(B7);
+
+bp1 := FloorBound(b7,1,7);
+for p1 in PrimesInInterval(2,bp1) do
+    	bp2 := FloorBound(b7,p1,6);
+    	if bp2 lt p1+1 then
+        	break;
+    	end if;
+	for p2 in PrimesInInterval(p1+1,bp2) do
+		bp3 := FloorBound(b7,p1*p2,5);
+		if bp3 lt p2+1 then
+				break;
+		end if;
+		for p3 in PrimesInInterval(p2+1,bp3) do
+			bp4 := FloorBound(b7,p1*p2*p3,4);
+			if bp4 lt p3+1 then
+				break;
+			end if;
+			for p4 in PrimesInInterval(p3+1,bp4) do
+				bp5 := FloorBound(b7,p1*p2*p3*p4,3);
+				if bp5 lt p4+1 then
+					break;
+				end if;
+				for p5 in PrimesInInterval(p4+1,bp5) do
+					bp6 := FloorBound(b7,p1*p2*p3*p4*p5,2);
+					if bp6 lt p5+1 then
+						break;
+					end if;
+					for p6 in PrimesInInterval(p5+1,bp6) do
+						B7_sub := [];
+						bp7 := FloorBound(b7,p1*p2*p3*p4*p5*p6,1);
+						if bp7 lt p6+1 then
+							break;
+						end if;
+						for p7 in PrimesInInterval(p6+1,bp7) do
+							N := p1*p2*p3*p4*p5*p6*p7;
+							if N le b7 then
+								prime_list_test := [p1,p2,p3,p4,p5,p6,p7];
+								print(prime_list_test);
+								for i in [1] do
+									sign_pattern := sign_list[i];
+									if NaiveSieve_pre(prime_list_test, p1, sign_pattern) then
+										B7_sub := B7_sub cat [prime_list_test];
+									end if;
+								end for;
+							end if;
+						end for;
+						
+						print("Legendre Sieve");
+						print(#B7_sub);
+						for prime_list_test in B7_sub do
+							print(prime_list_test);
+							for i in [1..#sign_list] do
+								sign_pattern := sign_list[i];
+								if NaiveSieve_two(prime_list_test, p1, sign_pattern) then
+									B7[i] := B7[i] cat [prime_list_test];
+								end if;
+							end for;
+						end for;
+					end for;
+				end for;
+			end for;
+		end for;
+	end for;
+end for;
+
+for i in [1..#sign_list] do
+	title := "Shimura-7-Results" cat IntegerToString(i);
+	if #B7[i] ge 2 then
+		Write(title,B7[i]: Overwrite := true);
+	end if;
+end for;
