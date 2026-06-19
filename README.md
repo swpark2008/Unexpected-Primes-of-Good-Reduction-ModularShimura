@@ -10,10 +10,10 @@ The following repository contains Magma and Sage implementations utilized to com
     + |d| = 3 mod 8, k = 0, 1, 2
     + |d| = 4 mod 16, k = 0, 1, 2, 3, 4, 5
     + |d| = 7 mod 8, k = 0, 1, 2
-    + |d| = 8 mod 16, k = 0, 1, 2, 3, 4, 5, 6, 7, 8, 9
+    + |d| = 8 mod 16, k = 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
   - Rename all the files in the following format and store under the folder "Shimura-Data":
     + cl_3_mod_8_k (where k = 0, 1, 2)
     + cl_4_mod_16_k (where k = 0, 1, 2, 3, 4, 5)
     + cl_7_mod_8_k (where k = 0, 1, 2)
-    + cl_8_mod_16_k (where k = 0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
+    + cl_8_mod_16_k (where k = 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
 * Another Magma code: We execute the file "sub_main.m", from which the gained primes of good reduction as well as genera of the original modular (Shimura) curves and their Atkin-Lehner quotients are computed. The output of running the code can be found under "Output" file. We would like to thank Freddy Saia and Oana Padurariu for sharing their github repository, whose code we used to implement "sub_main.m". (Link: https://github.com/fsaia/GenusAtMost2/blob/main/quot_genus.m).
