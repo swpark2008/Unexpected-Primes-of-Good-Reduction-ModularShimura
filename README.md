@@ -2,7 +2,7 @@
 
 The following repository contains Magma and Sage implementations utilized to compute the set of all possible levels for which the modular curves of level N and weight 2 with a given sign pattern have trivial dimensions.
 
-* Magma Code: We execute the file "Computations-PPV-Shimura". The total execution time and memory usage can be found in the file "ExecutionTime". The code will output all files of form "Shimura-W-ResultsXXX", where W is the number of distinct prime factors of the level N, and XXX indicates the type of sign pattern endowed to the modular curve with W many distinct prime factors.
+* Magma Code: We execute the file "Computations-PPV-Shimura". We note that the hard-coded upper bound on N for each "Computations-PPV-X-Shimura-Version3" file is computed using "boundceiling.m" file. The total execution time and memory usage can be found in the file "ExecutionTime". The code will output all files of form "Shimura-W-ResultsXXX", where W is the number of distinct prime factors of the level N, and XXX indicates the type of sign pattern endowed to the modular curve with W many distinct prime factors.
 * Given the execution time for running the Magma code is very long, we stored all the outputs one achieves from running the code under the folder "Shimura-Data".
 * Sage Code: We attach the jupyter notebook file "Snew-New.ipynb". A sample output of running the code can be downloaded using the html file "Snew-New.html". To run the "Snew-New.ipynb" code as shown in the file, one is required to follow the following procedures beforehand.
   - Access the LMFDB beta page: https://beta.lmfdb.org/NumberField/QuadraticImaginaryClassGroups
