@@ -58,7 +58,7 @@ SignPattern := function(F,F1,F2)
 	return result;
 end function;
 
-// module for Step3 sieve result on applying conditions for S. The only place to change is the set B* for the definition of omega and for loop statement for prime_list. Required input is the nested list of list of prime factors (B*) & p1 (the smallest possible prime number).
+// module for Step3 & 4 sieve result on applying conditions for S. The only place to change is the set B* for the definition of omega and for loop statement for prime_list. Required input is the nested list of list of prime factors (B*) & p1 (the smallest possible prime number).
 
 evaluate_sign := function(number_fact, large_number_fact, pattern)
 	LNF := Sort(SetToSequence(large_number_fact));
@@ -84,7 +84,7 @@ evaluate_sign := function(number_fact, large_number_fact, pattern)
 	end if;
 end function;
 
-// module for Step3 seive result on applying conditions for S. This evaluates the constant b(D, N/D) and tells what the sign is.
+// module for Step3 & 4 sieve result on applying conditions for S. This evaluates the constant b(D, N/D) and tells what the sign is.
 evaluate_b := function(D_input, NoverD_input)
 	if NoverD_input mod 2 eq 0 then
 		return -1;
@@ -93,7 +93,9 @@ evaluate_b := function(D_input, NoverD_input)
 	end if;
 end function;
 
-//Step 2: module for sieve result on sieving out list of prime factors before applying NaiveSieve_two. We evaluate \sum sqrt{d} 2^(omega(N/d)) log(4d) directly.
+//Step 3: module for sieve result on sieving out list of prime factors before applying NaiveSieve_two. 
+//We evaluate \sum sqrt{d} 2^(omega(N/d)) log(4d) directly.
+//See equation (2.29) in the manuscript in particular.
 NaiveSieve_pre := function(prime_list_test,p1,sign_pattern)
 	SetNthreads(64);
 	omega := #prime_list_test;
@@ -123,7 +125,8 @@ NaiveSieve_pre := function(prime_list_test,p1,sign_pattern)
 	end if;
 end function;
 
-//Step 3: module for sieve result on sieving out list of prime factors before applying NaiveSieve_two. We evaluate \sum sqrt{d} 2^(omega(N/d)) log(4d) directly. We use the approximation pi >= 3.14, and the exponent for 2 simplifies to omega(N) - omega(d) = omega(N/d). See equation (13) + (14) in particular. 
+//Step 4: module for sieve result on sieving out list of prime factors. 
+//See equation (2.30) in particular. 
 NaiveSieve_two := function(prime_list_test,p1,sign_pattern)
 	SetNthreads(64);
 	omega := #prime_list_test;
@@ -150,7 +153,7 @@ NaiveSieve_two := function(prime_list_test,p1,sign_pattern)
 		b_const := evaluate_b(D, NoverD);
 		// Sign of \prod_{p | N/D_odd} ((Legendre) - 1)
 		sign_x := (-1)^omega_NoverD;
-		// Condition (a) from Step 3
+		// Condition (a) from Step 4, equation (2.30)
 		if #x ne 0 and p1 ne 2 and D gt 3 and sign*b_const*sign_x eq 1 then
 			s := 0;
 			for q in x do
@@ -163,7 +166,7 @@ NaiveSieve_two := function(prime_list_test,p1,sign_pattern)
 				naive_estimate := naive_estimate + 2/3.14*D^(1/2)*Log(4*D)*2^(omega_NoverD);
 			end if;
 		end if;
-		// Condition (b) from Step 3
+		// Condition (b) from Step 4, equation (2.30)
 		if #x ne 0 and p1 eq 2 and D gt 3 and D mod 2 eq 1 and sign*b_const*sign_x eq -1 then
 			s := 0;
 			for q in x do
@@ -176,7 +179,7 @@ NaiveSieve_two := function(prime_list_test,p1,sign_pattern)
 				naive_estimate := naive_estimate + 2/3.14*D^(1/2)*Log(4*D)*2^(omega_NoverD);
 			end if;
 		end if;
-		// Condition (c) from Step 3
+		// Condition (c) from Step 4, equation (2.30)
 		if #x ne 0 and p1 eq 2 and D gt 3 and D mod 2 ne 1 and sign*b_const*sign_x eq -1 then
 			s := 0;
 			for q in x do
@@ -192,6 +195,8 @@ NaiveSieve_two := function(prime_list_test,p1,sign_pattern)
 		R := R - naive_estimate;
 	end for;
 
+	// To allow for the case where R is close to 0 whereas the dimension of associated weight 2 modular form is 0, 
+	// We let R to be strictly less than 1.
 	if R lt 1 then
 		return true;
 	else
