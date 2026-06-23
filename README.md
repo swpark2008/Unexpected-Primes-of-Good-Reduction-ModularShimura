@@ -1,6 +1,6 @@
 # Unexpected Primes of Good Reduction in Quotients of Modular and Shimura Curves
 
-The following repository contains Magma and Sage implementations utilized to compute the set of all possible levels for which the modular curves of level N and weight 2 with a given sign pattern have trivial dimensions, as well as the set of gained primes of good reduction for Atkin--Lehner quoteitns of modular and Shimura curves.
+The following repository contains Magma and Sage implementations utilized to compute the set of all possible levels for which the modular curves of level N and weight 2 with a given sign pattern have trivial dimensions, as well as the set of gained primes of good reduction for Atkin--Lehner quotients of modular and Shimura curves. The respective codes that implement results stated in Sections 2, 3, and 4 of the manuscript are stored in respective folders.
 
 ## Section 2: Dimensions of weight 2 newforms
 
