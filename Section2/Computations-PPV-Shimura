@@ -1,3 +1,4 @@
+SetNthreads(64);
 load "Computations-PPV-2-Shimura-Version3";
 load "Computations-PPV-3-Shimura-Version3";
 load "Computations-PPV-4-Shimura-Version3";
@@ -9,3 +10,13 @@ load "Computations-PPV-9-Shimura-Version3";
 load "Computations-PPV-10-Shimura-Version3";
 load "Computations-PPV-11-Shimura-Version3";
 load "Computations-PPV-12-Shimura-Version3";
+load "Computations-ClassNumber";
+print("ClassNumber Data Compiling");
+classno_data := ClassNumberCompiler_full();
+print("Dimension Computations");
+output_list := [];
+for omega in [2..8] do
+	m := EigenspaceFromDatabase(omega, classno_data);
+	output_list := output_list cat m;
+end for;
+print(output_list);

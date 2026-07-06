@@ -1,0 +1,180 @@
+load "Computations-Kimball";
+
+// Parsing function for LMFDB database (optional)
+ClassNumberReader := function(data_name, value)
+	param_list := Split(data_name,"_");
+	param := StringToInteger(param_list[4]);
+	lower_bound := -1*StringToInteger(param_list[5])*2^(28)-StringToInteger(param_list[2]);
+	print([param,lower_bound]);
+	
+	sub_data := Split(Read(data_name),"\n");
+	for i in [1..#sub_data] do
+		parse_string := Split(sub_data[i],"\t");
+		lower_bound := lower_bound - StringToInteger(parse_string[1])*param;
+		if Abs(lower_bound) eq value then
+			return StringToInteger(parse_string[2]);
+		end if;
+	end for;
+end function;
+
+// Parsing function for LMFDB database that combines small class numbers. Suitable for omega = 2,3,4,5,6
+ClassNumberCompiler_small := function()
+	SetNthreads(64);
+	data_name_list := ["cl_3_mod_8_0","cl_4_mod_16_0","cl_7_mod_8_0","cl_8_mod_16_0"];
+	class_data := AssociativeArray();
+	for data_name in data_name_list do
+		print(data_name);
+		param_list := Split(data_name,"_");
+		param := StringToInteger(param_list[4]);
+		lower_bound := -1*StringToInteger(param_list[5])*2^(28)-StringToInteger(param_list[2]);
+		sub_data := Split(Read(data_name),"\n");
+		for i in [1..#sub_data] do
+			parse_string := Split(sub_data[i],"\t");
+			lower_bound := lower_bound - StringToInteger(parse_string[1])*param;
+			class_data[lower_bound] := StringToInteger(parse_string[2]);
+		end for;
+	end for;
+	return class_data;
+end function;
+
+// Parsing function for LMFDB database that combines all class numbers. Required for omega = 7,8
+ClassNumberCompiler_full := function()
+	SetNthreads(64);
+	data_name_list := ["cl_3_mod_8_0","cl_3_mod_8_1","cl_3_mod_8_2","cl_4_mod_16_0","cl_4_mod_16_1","cl_4_mod_16_2","cl_4_mod_16_3","cl_4_mod_16_4","cl_4_mod_16_5","cl_7_mod_8_0","cl_7_mod_8_1","cl_7_mod_8_2","cl_8_mod_16_0","cl_8_mod_16_1","cl_8_mod_16_2","cl_8_mod_16_3","cl_8_mod_16_4","cl_8_mod_16_5","cl_8_mod_16_6","cl_8_mod_16_7","cl_8_mod_16_8","cl_8_mod_16_9","cl_8_mod_16_10"];
+	class_data := AssociativeArray();
+	for data_name in data_name_list do
+		print(data_name);
+		param_list := Split(data_name,"_");
+		param := StringToInteger(param_list[4]);
+		lower_bound := -1*StringToInteger(param_list[5])*2^(28)-StringToInteger(param_list[2]);
+		sub_data := Split(Read(data_name),"\n");
+		for i in [1..#sub_data] do
+			parse_string := Split(sub_data[i],"\t");
+			lower_bound := lower_bound - StringToInteger(parse_string[1])*param;
+			class_data[lower_bound] := StringToInteger(parse_string[2]);
+		end for;
+	end for;
+	return class_data;
+end function;
+
+// Construct database of class numbers from "Shimura-M-ResultsXXX" for M=7,8 files obtained as output of Computations-PPV-Shimura
+ClassnoFromDatabase := function(omega)
+	output := AssociativeArray();
+	divisors_database := {@ @};
+	SetNthreads(64);
+	// Combine all divisors occuring in "Shimura-X-ResultsXXX" files.
+	for index in [omega] do
+		file_name := "Shimura-";
+		file_name := file_name cat IntegerToString(index);
+		file_name := file_name cat "-Results";
+		for m in [1..2^(index)] do
+			sub_output := [];
+			sub_file_name := file_name cat IntegerToString(m);
+			sub_file := Read(sub_file_name);
+			sub_file := Split(sub_file,"\n");
+			sign_pattern := Split(sub_file[2],"[], ");
+			sign_pattern := [StringToInteger(s) : s in sign_pattern];
+			print(sign_pattern);
+			for lines in [3..#sub_file-1] do
+				new_line := Split(sub_file[lines],"[], ");
+				line_int := 1;
+				for factors in new_line do
+					line_int := line_int * StringToInteger(factors);
+				end for;
+				divisor_line := IndexedSet(Divisors(line_int));
+				divisors_database := divisors_database join divisor_line;
+			end for;
+		end for;
+	end for;
+	
+	for m in [1..#divisors_database] do
+		M_class := Delta(divisors_database[m]);
+		classno_m := Classno(M_class);
+		output[M_class] := classno_m;
+		if m mod 100 eq 0 then
+			print(m);
+		end if;
+	end for;
+	
+	return output;
+end function;
+
+Fundamental_Disc := function(level)
+	level := -1*level;
+	if level mod 4 eq 1 then
+		return level;
+	else
+		return 4*level;
+	end if;
+end function;
+
+// Reading Outputs of form "Shimura-M-ResultsXXX" files for M=2,3,4,5,6 obtained as output of Computations-PPV-Shimura
+EigenspaceFromDatabase := function(omega, classno_data)
+	output := [];
+	for index in [omega] do
+		file_name := "Shimura-";
+		file_name := file_name cat IntegerToString(index);
+		file_name := file_name cat "-Results";
+		for m in [1..2^(index)] do
+			sub_output := [];
+			sub_file_name := file_name cat IntegerToString(m);
+			sub_file := Read(sub_file_name);
+			sub_file := Split(sub_file,"\n");
+			sign_pattern := Split(sub_file[2],"[], ");
+			sign_pattern := [StringToInteger(s) : s in sign_pattern];
+			print(sign_pattern);
+			for lines in [3..#sub_file-1] do
+				new_line := Split(sub_file[lines],"[], ");
+				line_int := 1;
+				for factors in new_line do
+					line_int := line_int * StringToInteger(factors);
+				end for;
+				dim := Refdim(line_int, Signpatint(sign_pattern), 2, classno_data);
+				if dim eq 0 then
+					print(line_int);
+					sub_output := sub_output cat [line_int];
+				end if;
+			end for;
+			output_pre := [sign_pattern] cat [sub_output];
+			if #sub_output ne 0 then
+				output := output cat output_pre;
+			end if;
+		end for;
+	end for;
+	return output;
+end function;
+
+// Reading Outputs of form "Shimura-M-ResultsXXX" files for M=7,8 obtained as output of Computations-PPV-Shimura
+EigenspaceFromDatabase_big := function(omega)
+	output := [];
+	classno_data := ClassnoFromDatabase(omega);
+	for index in [omega] do
+		file_name := "Shimura-";
+		file_name := file_name cat IntegerToString(index);
+		file_name := file_name cat "-Results";
+		for m in [1..2^(index)] do
+			sub_output := [];
+			sub_file_name := file_name cat IntegerToString(m);
+			sub_file := Read(sub_file_name);
+			sub_file := Split(sub_file,"\n");
+			sign_pattern := Split(sub_file[2],"[], ");
+			sign_pattern := [StringToInteger(s) : s in sign_pattern];
+			print(sign_pattern);
+			for lines in [3..#sub_file-1] do
+				new_line := Split(sub_file[lines],"[], ");
+				line_int := 1;
+				for factors in new_line do
+					line_int := line_int * StringToInteger(factors);
+				end for;
+				dim := Refdim(line_int, Signpatint(sign_pattern), 2, classno_data);
+				if dim eq 0 then
+					print(line_int);
+					sub_output := sub_output cat [line_int];
+				end if;
+			end for;
+			output_pre := [sign_pattern] cat [sub_output];
+			output := output cat output_pre;
+		end for;
+	end for;
+	return output;
+end function;
