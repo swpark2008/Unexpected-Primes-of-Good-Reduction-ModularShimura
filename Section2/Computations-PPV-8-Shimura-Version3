@@ -84,7 +84,7 @@ end for;
 
 for i in [1..#sign_list] do
 	title := "Shimura-8-Results" cat IntegerToString(i);
-	if #B8[i] ge 2 then
+	if #B8[i] ge 1 then
 		Write(title,B8[i]: Overwrite := true);
 	end if;
 end for;
