@@ -22,7 +22,7 @@ The following codes can be used to obtain Tables 2, 3, 4, and 5 from the manuscr
 
 ## Section 3: Gained primes of good reduction
 
-We execute the file "sub_main.m", from which the gained primes of good reduction as well as genera of the original modular (Shimura) curves and their Atkin--Lehner quotients are computed. The output of running the code can be found under "Output" file. We would like to thank Freddy Saia and Oana Padurariu for sharing their github repository, whose code we used to implement "sub_main.m". (Link: https://github.com/fsaia/GenusAtMost2/blob/main/quot_genus.m).
+We execute the file "sub_main.m", from which the gained primes of good reduction as well as genera of the original modular (Shimura) curves and their Atkin--Lehner quotients are computed. The output of running the code can be found under "Output" file. We would like to thank Oana Padurariu and Freddy Saia for sharing their github repository, whose code we used to implement "sub_main.m". (Link: https://github.com/fsaia/GenusAtMost2/blob/main/quot_genus.m).
 
 ## Section 4: Tables
 
