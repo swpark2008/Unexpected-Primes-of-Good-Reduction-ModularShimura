@@ -2,6 +2,10 @@
 
 The following repository contains Magma and Sage implementations utilized to compute the set of all possible levels for which the modular curves of level N and weight 2 with a given sign pattern have trivial dimensions, as well as the set of gained primes of good reduction for Atkin--Lehner quotients of modular and Shimura curves. The respective codes that implement results stated in Sections 2, 3, and 4 of the manuscript are stored in respective folders.
 
+## Statement on usage of AI
+
+We only used AI (ChatGPT 5.6-Sol) to generate the Magma code for classifying intermediate Atkin-Lehner quotients of X_0^*(D; N) in Remark 3.9 of the manuscript.
+
 ## Section 2: Dimensions of weight 2 newforms
 
 The following codes can be used to obtain Tables 2, 3, 4, and 5 from the manuscript. We refer to page 8-9, steps 1 through 5 for further details of the implementation. (Expected execution time with 64 threads: about 3 days and 6 hours).
@@ -23,6 +27,8 @@ The following codes can be used to obtain Tables 2, 3, 4, and 5 from the manuscr
 ## Section 3: Gained primes of good reduction
 
 We execute the file "sub_main.m", from which the gained primes of good reduction as well as genera of the original modular (Shimura) curves and their Atkin--Lehner quotients are computed. The output of running the code can be found under "Output" file. We would like to thank Oana Padurariu and Freddy Saia for sharing their github repository, whose code we used to implement "sub_main.m". (Link: https://github.com/fsaia/GenusAtMost2/blob/main/quot_genus.m).
+
+For classifying intermediate Atkin-Lehner quotients of X_0^*(D; N), as stated in Remark 3.9, we used AI (ChatGPT 5.6-Sol) to generate the Magma code for classifying these quotients. 
 
 ## Section 4: Tables
 
