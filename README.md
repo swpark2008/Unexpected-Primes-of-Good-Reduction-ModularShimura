@@ -28,7 +28,7 @@ The following codes can be used to obtain Tables 2, 3, 4, and 5 from the manuscr
 
 We execute the file "sub_main.m", from which the gained primes of good reduction as well as genera of the original modular (Shimura) curves and their Atkin--Lehner quotients are computed. The output of running the code can be found under "Output" file. We would like to thank Oana Padurariu and Freddy Saia for sharing their github repository, whose code we used to implement "sub_main.m". (Link: https://github.com/fsaia/GenusAtMost2/blob/main/quot_genus.m).
 
-For classifying intermediate Atkin-Lehner quotients of X_0^*(D; N), as stated in Remark 3.9, we used AI (ChatGPT 5.6-Sol) to generate the Magma code for classifying these quotients. 
+For classifying intermediate Atkin-Lehner quotients of X_0^*(D; N), as stated in Remark 3.9, we used AI (ChatGPT 5.6-Sol) to generate the Magma code for classifying these quotients. The relevant codes and outputs can be found under the folder "Remark3.9" under "Section3". 
 
 ## Section 4: Tables
 
